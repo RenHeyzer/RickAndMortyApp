@@ -5,9 +5,8 @@ import android.graphics.Color
 import android.view.MenuItem
 import android.widget.SearchView
 import com.example.rickandmortyapp.R
-import kotlinx.coroutines.Job
 
-fun SearchView.submitSearch(getFilterByName: (query: String?) -> Job) {
+fun SearchView.submitSearch(getFilterByName: (query: String?) -> Unit) {
     this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
             getFilterByName(query)
@@ -15,7 +14,6 @@ fun SearchView.submitSearch(getFilterByName: (query: String?) -> Job) {
         }
 
         override fun onQueryTextChange(query: String?): Boolean {
-            getFilterByName(query)
             return false
         }
     })
@@ -35,6 +33,7 @@ fun MenuItem.setOnActionExpandListener(searchView: SearchView, hideKeyboard: () 
         }
 
         override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+            searchView.setQuery("", true)
             hideKeyboard()
             return true
         }
