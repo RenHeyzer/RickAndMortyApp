@@ -8,9 +8,11 @@ import com.example.rickandmortyapp.domain.models.RickAndMorty
 
 class LocationsPagingSource(
     private val service: LocationsApiService,
-    private val name: String
+    private val name: String,
+    private val type: String,
+    private val dimension: String
 ) :
     BasePagingSource<RickAndMortyDto.LocationsItem, RickAndMorty.LocationsItem>(
-        { service.getLocations(it, name) },
+        { service.getLocations(it, name, type, dimension) },
         { data -> data.map { it.toLocations() } }
     )
