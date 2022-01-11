@@ -2,30 +2,23 @@ package com.example.rickandmortyapp.presentation.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
 import com.example.rickandmortyapp.R
+import com.example.rickandmortyapp.base.BaseDiffUtilItemCallback
 import com.example.rickandmortyapp.databinding.ItemCharactersBinding
 import com.example.rickandmortyapp.databinding.ItemEpisodesBinding
 import com.example.rickandmortyapp.databinding.ItemLocationsBinding
 import com.example.rickandmortyapp.domain.models.RickAndMorty
 
-class SearchAdapter :
-    PagingDataAdapter<RickAndMorty, SearchRecyclerViewHolder<ViewBinding>>(
-        SearchDiffUtil()
+class SearchAdapter(
+    private val onItemCharacterClick: (id: Int, name: String) -> Unit,
+    private val onItemLocationClick: (id: Int, name: String) -> Unit,
+    private val onItemEpisodeClick: (id: Int, name: String) -> Unit
+) :
+    ListAdapter<RickAndMorty.GeneralItem, SearchRecyclerViewHolder<ViewBinding>>(
+        BaseDiffUtilItemCallback()
     ) {
-
-    class SearchDiffUtil : DiffUtil.ItemCallback<RickAndMorty>() {
-
-        override fun areItemsTheSame(oldItem: RickAndMorty, newItem: RickAndMorty): Boolean {
-            return oldItem == newItem
-        }
-
-        override fun areContentsTheSame(oldItem: RickAndMorty, newItem: RickAndMorty): Boolean {
-            return oldItem == newItem
-        }
-    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -34,6 +27,7 @@ class SearchAdapter :
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.item_characters -> SearchRecyclerViewHolder.CharactersViewHolder(
+                onItemCharacterClick,
                 ItemCharactersBinding.inflate(
                     inflater,
                     parent,
@@ -41,6 +35,7 @@ class SearchAdapter :
                 )
             )
             R.layout.item_locations -> SearchRecyclerViewHolder.LocationsViewHolder(
+                onItemLocationClick,
                 ItemLocationsBinding.inflate(
                     inflater,
                     parent,
@@ -48,6 +43,7 @@ class SearchAdapter :
                 )
             )
             R.layout.item_episodes -> SearchRecyclerViewHolder.EpisodesViewHolder(
+                onItemEpisodeClick,
                 ItemEpisodesBinding.inflate(
                     inflater,
                     parent,
@@ -62,72 +58,30 @@ class SearchAdapter :
         holder: SearchRecyclerViewHolder<ViewBinding>,
         position: Int
     ) {
-        when (holder) {
-            is SearchRecyclerViewHolder.CharactersViewHolder ->
-                holder.onBind(getItem(position) as RickAndMorty.CharactersItem)
-            is SearchRecyclerViewHolder.LocationsViewHolder ->
-                holder.onBind(getItem(position) as RickAndMorty.LocationsItem)
-            is SearchRecyclerViewHolder.EpisodesViewHolder ->
-                holder.onBind(getItem(position) as RickAndMorty.EpisodesItem)
+        when (getItemViewType(position)) {
+            R.layout.item_characters -> (
+                    holder as SearchRecyclerViewHolder.CharactersViewHolder
+                    ).onBind(getItem(position))
+            R.layout.item_locations -> (
+                    holder as SearchRecyclerViewHolder.LocationsViewHolder
+                    ).onBind(getItem(position))
+            R.layout.item_episodes -> (
+                    holder as SearchRecyclerViewHolder.EpisodesViewHolder
+                    ).onBind(getItem(position))
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is RickAndMorty.CharactersItem -> R.layout.item_characters
-            is RickAndMorty.LocationsItem -> R.layout.item_locations
-            is RickAndMorty.EpisodesItem -> R.layout.item_episodes
-            null -> throw IllegalStateException("Unknown view")
+        return when {
+            getItem(position).status?.isNotEmpty() == true -> {
+                R.layout.item_characters
+            }
+            getItem(position).airDate?.isNotEmpty() == true -> {
+                R.layout.item_episodes
+            }
+            else -> {
+                R.layout.item_locations
+            }
         }
     }
 }
-
-//inner class CharactersViewHolder(
-//    binding: ItemCharactersBinding
-//) : BaseRecyclerViewHolder<ItemCharactersBinding, RickAndMorty.CharactersItem>(binding) {
-//
-//    override fun onBind(item: RickAndMorty.CharactersItem) = with(binding) {
-//        itemName.text = item.characters.name
-//        itemImage.loadImage(item.characters.image)
-//        itemStatus.text = item.characters.status
-//        itemSpecies.text = item.characters.species
-//        itemLocation.text = item.characters.location.name
-//        itemEpisode.text = item.characters.origin.name
-//
-//        when (item.characters.status) {
-//
-//            "Alive" -> statusDot.setImageResource(R.drawable.ic_dot)
-//
-//            "Dead" -> statusDot.setImageResource(R.drawable.ic_dot_red)
-//
-//            "unknown" -> statusDot.setImageResource(R.drawable.ic_dot_gray)
-//        }
-//    }
-//}
-//
-//inner class LocationsViewHolder(
-//    binding: ItemLocationsBinding
-//) : BaseRecyclerViewHolder<ItemLocationsBinding, RickAndMorty.LocationsItem>(binding) {
-//
-//    override fun onBind(item: RickAndMorty.LocationsItem) = with(binding) {
-//        itemName.text = item.locations.name
-//        itemType.text = item.locations.type
-//        imagePlanet.isVisible = item.locations.type == "Planet"
-//        itemCreated.text = toFormatDate(item.locations.created)
-//        itemDimension.text = item.locations.dimension
-//    }
-//}
-//
-//inner class EpisodesViewHolder(
-//    binding: ItemEpisodesBinding
-//) : BaseRecyclerViewHolder<ItemEpisodesBinding, RickAndMorty.EpisodesItem>(binding) {
-//
-//    override fun onBind(item: RickAndMorty.EpisodesItem) = with(binding) {
-//        itemName.text = item.episodes.name
-//        itemEpisode.text = item.episodes.episode
-//            ?.replace("S", "Season ")
-//            ?.replace("E", " Episode ")
-//        itemCreated.text = toFormatDate(item.episodes.created)
-//        itemAirDate.text = item.episodes.airDate
-//    }
-//}
