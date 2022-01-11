@@ -8,9 +8,10 @@ import com.example.rickandmortyapp.domain.models.RickAndMorty
 
 class EpisodesPagingSource(
     private val service: EpisodesApiService,
-    private val name: String
+    private val name: String,
+    private val episode: String
 ) :
     BasePagingSource<RickAndMortyDto.EpisodesItem, RickAndMorty.EpisodesItem>(
-        { service.getEpisodes(it, name) },
+        { service.getEpisodes(it, name, episode) },
         { data -> data.map { it.toEpisodes() } }
     )
