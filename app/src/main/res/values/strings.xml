@@ -22,6 +22,14 @@
     <string name="item_episode_text">Episode</string>
     <string name="air_date">The air date was:</string>
     <string name="searching">Поиск...</string>
-    <string name="no_results_found">No results found</string>
+    <string name="no_results_found">Результатов не найдено!</string>
     <string name="error_number">404</string>
+    <string name="write_type_here">Write type here…</string>
+    <string name="write_dimension_here">Write dimension here…</string>
+    <string name="write_episode_number_here">Write episode number here…</string>
+    <string name="filter_apply_button_text">ПРИМЕНИТЬ</string>
+    <string name="characters_filter_type">Characters</string>
+    <string name="locations_filter_type">Locations</string>
+    <string name="episodes_filter_type">Episodes</string>
+    <string name="search_filter_type">Search</string>
 </resources>
