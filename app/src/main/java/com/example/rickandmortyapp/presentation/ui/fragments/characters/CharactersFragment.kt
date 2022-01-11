@@ -3,10 +3,13 @@ package com.example.rickandmortyapp.presentation.ui.fragments.characters
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -30,6 +33,7 @@ class CharactersFragment : BaseFragment<FragmentCharactersBinding, CharactersVie
     override val binding by viewBinding(FragmentCharactersBinding::bind)
     override val viewModel by viewModels<CharactersViewModel>()
     private val adapter = CharactersAdapter(this::onClickToDetail)
+    private val args by navArgs<CharactersFragmentArgs>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,22 +59,35 @@ class CharactersFragment : BaseFragment<FragmentCharactersBinding, CharactersVie
         adapter.addLoadStateListener {
             if (view != null) {
                 charactersLoading.isVisible = it.refresh is LoadState.Loading
-                container.containerNotFound.isVisible = it.refresh is LoadState.Error
                 charactersRecycler.isVisible = it.refresh !is LoadState.Error
+                container.containerNotFound.isVisible =
+                    it.refresh is LoadState.Error && it.append is LoadState.NotLoading
             }
         }
     }
 
     override fun setupRequests() {
-        viewModel.getCharacters("")
+        if (args.status == "" && args.gender == "") {
+            viewModel.getCharacters("")
+        } else {
+            viewModel.getCharactersWithFilter("", args.status, args.gender)
+        }
     }
 
     override fun setupObserves() {
-        viewModel.charactersState.observe(viewLifecycleOwner, {
-            lifecycleScope.launch {
-                adapter.submitData(it)
-            }
-        })
+        if (args.status == "" && args.gender == "") {
+            viewModel.charactersState.observe(viewLifecycleOwner, {
+                lifecycleScope.launch {
+                    adapter.submitData(it)
+                }
+            })
+        } else {
+            viewModel.charactersFilterState.observe(viewLifecycleOwner, {
+                lifecycleScope.launch {
+                    adapter.submitData(it)
+                }
+            })
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -81,12 +98,35 @@ class CharactersFragment : BaseFragment<FragmentCharactersBinding, CharactersVie
 
         searchView.setTools(context)
 
-        searchView.submitSearch { viewModel.getCharacters(it.toString()) }
+        if (args.status == "" && args.gender == "") {
+            searchView.submitSearch { viewModel.getCharacters(it.toString()) }
+        } else {
+            searchView.submitSearch {
+                viewModel.getCharactersWithFilter(
+                    it.toString(),
+                    args.status,
+                    args.gender
+                )
+            }
+        }
 
         searchItem.setOnActionExpandListener(searchView) { hideKeyboard() }
     }
 
-    private fun onClickToDetail(id: Int?) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.filter) {
+            findNavController().navigate(
+                CharactersFragmentDirections.actionCharactersFragmentToFilterDialogFragment(
+                    getString(R.string.characters_filter_type)
+                )
+            )
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
+    private fun onClickToDetail(id: Int, name: String) {
+        val action = CharactersFragmentDirections
+            .actionCharactersFragmentToCharacterDetailFragment(id, name)
+        findNavController().navigate(action)
     }
 }
