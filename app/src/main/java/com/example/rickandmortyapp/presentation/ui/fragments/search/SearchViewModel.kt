@@ -3,53 +3,44 @@ package com.example.rickandmortyapp.presentation.ui.fragments.search
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import com.example.rickandmortyapp.base.BaseViewModel
 import com.example.rickandmortyapp.domain.models.RickAndMorty
-import com.example.rickandmortyapp.domain.usecases.GetCharactersUseCase
-import com.example.rickandmortyapp.domain.usecases.GetEpisodesUseCase
-import com.example.rickandmortyapp.domain.usecases.GetLocationsUseCase
+import com.example.rickandmortyapp.domain.usecases.GetCharactersBySearchUseCase
+import com.example.rickandmortyapp.domain.usecases.GetEpisodesBySearchUseCase
+import com.example.rickandmortyapp.domain.usecases.GetLocationsBySearchUseCase
+import com.example.rickandmortyapp.presentation.state.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val getAllCharacters: GetCharactersUseCase,
-    private val getAllLocations: GetLocationsUseCase,
-    private val getAllEpisodes: GetEpisodesUseCase
+    private val getAllCharactersBySearch: GetCharactersBySearchUseCase,
+    private val getAllLocationsBySearch: GetLocationsBySearchUseCase,
+    private val getAllEpisodesBySearch: GetEpisodesBySearchUseCase
 ) : BaseViewModel() {
 
-    private val _allState = MutableLiveData<PagingData<RickAndMorty>>()
-    val allState: LiveData<PagingData<RickAndMorty>> = _allState
+    private val _generalState = MutableLiveData<UIState<List<RickAndMorty.GeneralItem>>>()
+    val generalState: LiveData<UIState<List<RickAndMorty.GeneralItem>>> = _generalState
 
-    fun processAllRequest(name: String) = viewModelScope.launch {
-        val charactersDeferred =
-            withContext(Dispatchers.IO) {
-                getAllCharacters(name)
+    fun processAllRequests(
+        name: String
+    ) {
+        viewModelScope.launch {
+            val charactersDeferred = async { getAllCharactersBySearch(name) }
+            val locationsDeferred = async { getAllLocationsBySearch(name) }
+            val episodesDeferred = async { getAllEpisodesBySearch(name) }
+
+            val general = awaitAll(charactersDeferred, locationsDeferred, episodesDeferred)
+            val generalList = ArrayList<RickAndMorty.GeneralItem>()
+
+            general.map {
+                subscribeToAsync(_generalState, generalList) {
+                    it
+                }
             }
-        val locationsDeferred =
-            withContext(Dispatchers.IO) {
-                getAllLocations(name)
-            }
-        val episodesDeferred =
-            withContext(Dispatchers.IO) {
-                getAllEpisodes(name)
-            }
-
-        charactersDeferred.collect {
-            _allState.postValue(it as PagingData<RickAndMorty>)
-        }
-
-        locationsDeferred.collect {
-            _allState.postValue(it as PagingData<RickAndMorty>)
-        }
-
-        episodesDeferred.collect {
-            _allState.postValue(it as PagingData<RickAndMorty>)
         }
     }
 }
