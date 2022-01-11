@@ -7,5 +7,6 @@ class GetCharactersUseCase @Inject constructor(
     private val repository: CharactersRepository
 ) {
 
-    operator fun invoke(name: String) = repository.getCharacters(name)
+    operator fun invoke(name: String, status: String, gender: String) =
+        repository.getCharacters(name, status, gender)
 }

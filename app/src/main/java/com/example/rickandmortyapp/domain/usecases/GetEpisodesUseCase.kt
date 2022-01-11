@@ -7,5 +7,6 @@ class GetEpisodesUseCase @Inject constructor(
     private val repository: EpisodesRepository
 ) {
 
-    operator fun invoke(name: String) = repository.getEpisodes(name)
+    operator fun invoke(name: String, episode: String) =
+        repository.getEpisodes(name, episode)
 }

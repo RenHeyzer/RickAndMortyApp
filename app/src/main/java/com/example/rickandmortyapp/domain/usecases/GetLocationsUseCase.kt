@@ -7,5 +7,6 @@ class GetLocationsUseCase @Inject constructor(
     private val repository: LocationsRepository
 ) {
 
-    operator fun invoke(name: String) = repository.getLocations(name)
+    operator fun invoke(name: String, type: String, dimension: String) =
+        repository.getLocations(name, type, dimension)
 }
