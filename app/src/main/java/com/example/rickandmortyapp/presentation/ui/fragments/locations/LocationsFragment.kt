@@ -3,10 +3,13 @@ package com.example.rickandmortyapp.presentation.ui.fragments.locations
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -28,7 +31,8 @@ class LocationsFragment :
 
     override val binding by viewBinding(FragmentLocationsBinding::bind)
     override val viewModel by viewModels<LocationsViewModel>()
-    private val adapter: LocationsAdapter = LocationsAdapter()
+    private val adapter: LocationsAdapter = LocationsAdapter(this::onClickToDetail)
+    private val args by navArgs<LocationsFragmentArgs>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,24 +54,39 @@ class LocationsFragment :
         setupProgressBar()
     }
 
-    private fun setupProgressBar() {
+    private fun setupProgressBar() = with(binding) {
         adapter.addLoadStateListener {
             if (view != null) {
-                binding.locationsLoading.isVisible = it.refresh is LoadState.Loading
+                locationsLoading.isVisible = it.refresh is LoadState.Loading
+                locationsRecycler.isVisible = it.refresh !is LoadState.Error
+                container.containerNotFound.isVisible =
+                    it.refresh is LoadState.Error && it.append is LoadState.NotLoading
             }
         }
     }
 
     override fun setupRequests() {
-        viewModel.getLocations("")
+        if (args.type == "" && args.dimension == "") {
+            viewModel.getLocations("")
+        } else {
+            viewModel.getLocationsWithFilter("", args.type, args.dimension)
+        }
     }
 
     override fun setupObserves() {
-        viewModel.locationsState.observe(viewLifecycleOwner, {
-            lifecycleScope.launch {
-                adapter.submitData(it)
-            }
-        })
+        if (args.type == "" && args.dimension == "") {
+            viewModel.locationsState.observe(viewLifecycleOwner, {
+                lifecycleScope.launch {
+                    adapter.submitData(it)
+                }
+            })
+        } else {
+            viewModel.locationsFilterSate.observe(viewLifecycleOwner, {
+                lifecycleScope.launch {
+                    adapter.submitData(it)
+                }
+            })
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -78,8 +97,36 @@ class LocationsFragment :
 
         searchView.setTools(context)
 
-        searchView.submitSearch { viewModel.getLocations(it.toString()) }
+        if (args.type == "" && args.dimension == "") {
+            searchView.submitSearch { viewModel.getLocations(it.toString()) }
+        } else {
+            searchView.submitSearch {
+                viewModel.getLocationsWithFilter(
+                    it.toString(),
+                    args.type,
+                    args.dimension
+                )
+            }
+        }
 
         searchItem.setOnActionExpandListener(searchView) { hideKeyboard() }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.filter) {
+            findNavController().navigate(
+                LocationsFragmentDirections
+                    .actionLocationsFragmentToFilterDialogFragment(
+                        getString(R.string.locations_filter_type)
+                    )
+            )
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun onClickToDetail(id: Int, name: String) {
+        val action = LocationsFragmentDirections
+            .actionLocationsFragmentToLocationDetailFragment(id, name)
+        findNavController().navigate(action)
     }
 }
