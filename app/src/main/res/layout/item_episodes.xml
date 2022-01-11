@@ -22,7 +22,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/passion_one"
-            android:hint="@string/item_title_hint"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -33,12 +32,12 @@
             android:id="@+id/item_episode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAlignment="textEnd"
             android:fontFamily="@font/passion_one"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textAlignment="textEnd"
             android:textColor="@color/white"
             android:textSize="@dimen/item_title_text_size"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/item_episode_text" />
 
         <TextView
@@ -57,12 +56,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/passion_one"
-            android:hint="@string/item_title_hint"
             android:textColor="@color/white"
             android:textSize="@dimen/item_title_text_size"
-            app:layout_constraintTop_toBottomOf="@id/was_created_in"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/was_created_in"
             tools:text="@string/item_created_text" />
 
         <TextView
@@ -81,7 +79,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/passion_one"
-            android:hint="@string/item_title_hint"
             android:textColor="@color/white"
             android:textSize="@dimen/item_title_text_size"
             app:layout_constraintLeft_toLeftOf="parent"
