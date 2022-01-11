@@ -20,9 +20,22 @@ class EpisodesViewModel @Inject constructor(
     private val _episodesState = MutableLiveData<PagingData<RickAndMorty.EpisodesItem>>()
     val episodesSate: LiveData<PagingData<RickAndMorty.EpisodesItem>> = _episodesState
 
-    fun getEpisodes(name: String) = viewModelScope.launch {
-        getAllEpisodes(name).collect {
-            _episodesState.value = it as PagingData<RickAndMorty.EpisodesItem>
+    private val _episodesFilterState = MutableLiveData<PagingData<RickAndMorty.EpisodesItem>>()
+    val episodesFilterSate: LiveData<PagingData<RickAndMorty.EpisodesItem>> = _episodesFilterState
+
+    fun getEpisodes(name: String) {
+        viewModelScope.launch {
+            getAllEpisodes(name, episode = "").collect {
+                _episodesState.value = it as PagingData<RickAndMorty.EpisodesItem>
+            }
+        }
+    }
+
+    fun getEpisodesWithFilter(name: String, episode: String) {
+        viewModelScope.launch {
+            getAllEpisodes(name, episode).collect {
+                _episodesFilterState.value = it as PagingData<RickAndMorty.EpisodesItem>
+            }
         }
     }
 }
