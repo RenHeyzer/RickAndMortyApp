@@ -1,6 +1,7 @@
 package com.example.rickandmortyapp.presentation.ui.activity
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -22,9 +23,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         super.onCreate(savedInstanceState)
         setupNavigation()
         setupListeners()
-//        supportActionBar?.setHomeAsUpIndicator(R.drawable.rickandmortytitle)
-//        supportActionBar?.setHomeButtonEnabled(true)
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun setupListeners() {
@@ -50,11 +48,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private fun onDestinationChangedListener() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.charactersFragment
-                -> {
+                R.id.charactersFragment -> {
                 }
-                R.id.locationsFragment
-                -> {
+                R.id.locationsFragment -> {
                 }
                 R.id.episodesFragment -> {
                 }
@@ -64,5 +60,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 }
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
