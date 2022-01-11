@@ -24,11 +24,40 @@ abstract class BaseViewModel : ViewModel() {
                     is Resource.Error -> {
                         it.message?.let { error ->
                             state.value = UIState.Error(error)
+
                         }
                     }
                     is Resource.Success -> {
                         it.data?.let { data ->
                             state.value = UIState.Success(data)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected fun <T> subscribeToAsync(
+        state: MutableLiveData<UIState<List<T>>>,
+        list: ArrayList<T>,
+        request: () -> Flow<Resource<List<T>>>
+    ) {
+        viewModelScope.launch {
+            request().collect {
+                when (it) {
+                    is Resource.Loading -> {
+                        state.value = UIState.Loading()
+                    }
+                    is Resource.Error -> {
+                        it.message?.let { error ->
+                            state.value = UIState.Error(error)
+
+                        }
+                    }
+                    is Resource.Success -> {
+                        it.data?.let { data ->
+                            list.addAll(data)
+                            state.value = UIState.Success(list)
                         }
                     }
                 }
