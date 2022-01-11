@@ -1,16 +1,10 @@
 package com.example.rickandmortyapp.data.network.dtos.models
 
-import com.example.rickandmortyapp.data.network.dtos.models.character.CharactersModelDto
 import com.example.rickandmortyapp.data.network.dtos.models.character.LocationDto
 import com.example.rickandmortyapp.data.network.dtos.models.character.OriginDto
-import com.example.rickandmortyapp.data.network.dtos.models.episode.EpisodesModelDto
-import com.example.rickandmortyapp.data.network.dtos.models.location.LocationsModelDto
 import com.example.rickandmortyapp.domain.models.RickAndMorty
-import com.example.rickandmortyapp.domain.models.character.CharactersModel
 import com.example.rickandmortyapp.domain.models.character.Location
 import com.example.rickandmortyapp.domain.models.character.Origin
-import com.example.rickandmortyapp.domain.models.episode.EpisodesModel
-import com.example.rickandmortyapp.domain.models.location.LocationsModel
 
 fun RickAndMortyDto.CharactersItem.toCharacters(): RickAndMorty.CharactersItem =
     RickAndMorty.CharactersItem(
@@ -18,25 +12,9 @@ fun RickAndMortyDto.CharactersItem.toCharacters(): RickAndMorty.CharactersItem =
         gender,
         species,
         created,
-        origin.toOrigin(),
+        origin?.toOrigin(),
         name,
-        location.toLocation(),
-        episode,
-        id,
-        type,
-        url,
-        status
-    )
-
-fun CharactersModelDto.toCharactersModel(): CharactersModel =
-    CharactersModel(
-        image,
-        gender,
-        species,
-        created,
-        origin.toOrigin(),
-        name,
-        location.toLocation(),
+        location?.toLocation(),
         episode,
         id,
         type,
@@ -61,17 +39,6 @@ fun RickAndMortyDto.LocationsItem.toLocations(): RickAndMorty.LocationsItem =
         url
     )
 
-fun LocationsModelDto.toLocationsModel(): LocationsModel =
-    LocationsModel(
-        created,
-        name,
-        residents,
-        id,
-        type,
-        dimension,
-        url
-    )
-
 fun RickAndMortyDto.EpisodesItem.toEpisodes(): RickAndMorty.EpisodesItem =
     RickAndMorty.EpisodesItem(
         airDate,
@@ -83,13 +50,62 @@ fun RickAndMortyDto.EpisodesItem.toEpisodes(): RickAndMorty.EpisodesItem =
         url
     )
 
-fun EpisodesModelDto.toEpisodesModel(): EpisodesModel =
-    EpisodesModel(
+fun RickAndMortyDto.CharactersItem.toGeneral(): RickAndMorty.GeneralItem =
+    RickAndMorty.GeneralItem(
+        image,
+        gender,
+        species,
+        created,
+        origin?.toOrigin(),
+        name,
+        location?.toLocation(),
+        id,
+        type,
+        status,
+        airDate = null,
+        characters = null,
+        episode = null,
+        residents = null,
+        dimension = null,
+        url
+    )
+
+fun RickAndMortyDto.LocationsItem.toGeneral(): RickAndMorty.GeneralItem =
+    RickAndMorty.GeneralItem(
+        image = null,
+        gender = null,
+        species = null,
+        created,
+        origin = null,
+        name,
+        location = null,
+        id,
+        type,
+        status = null,
+        airDate = null,
+        characters = null,
+        episode = null,
+        residents,
+        dimension,
+        url
+    )
+
+fun RickAndMortyDto.EpisodesItem.toGeneral(): RickAndMorty.GeneralItem =
+    RickAndMorty.GeneralItem(
+        image = null,
+        gender = null,
+        species = null,
+        created,
+        origin = null,
+        name,
+        location = null,
+        id,
+        type = null,
+        status = null,
         airDate,
         characters,
-        created,
         episode,
-        name,
-        id,
+        residents = null,
+        dimension = null,
         url
     )
