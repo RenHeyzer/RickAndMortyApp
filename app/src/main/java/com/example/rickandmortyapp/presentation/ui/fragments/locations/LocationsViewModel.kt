@@ -21,9 +21,23 @@ class LocationsViewModel @Inject constructor(
     private val _locationsState = MutableLiveData<PagingData<RickAndMorty.LocationsItem>>()
     val locationsState: LiveData<PagingData<RickAndMorty.LocationsItem>> = _locationsState
 
-    fun getLocations(name: String) = viewModelScope.launch {
-        getAllLocations(name).collect {
-            _locationsState.value = it as PagingData<RickAndMorty.LocationsItem>
+    private val _locationsFilterState = MutableLiveData<PagingData<RickAndMorty.LocationsItem>>()
+    val locationsFilterSate: LiveData<PagingData<RickAndMorty.LocationsItem>> =
+        _locationsFilterState
+
+    fun getLocations(name: String) {
+        viewModelScope.launch {
+            getAllLocations(name, type = "", dimension = "").collect {
+                _locationsState.value = it as PagingData<RickAndMorty.LocationsItem>
+            }
+        }
+    }
+
+    fun getLocationsWithFilter(name: String, type: String, dimension: String) {
+        viewModelScope.launch {
+            getAllLocations(name, type, dimension).collect {
+                _locationsFilterState.value = it as PagingData<RickAndMorty.LocationsItem>
+            }
         }
     }
 }
