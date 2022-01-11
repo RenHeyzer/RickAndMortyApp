@@ -3,10 +3,13 @@ package com.example.rickandmortyapp.presentation.ui.fragments.episodes
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -29,7 +32,8 @@ class EpisodesFragment : BaseFragment<FragmentEpisodesBinding, EpisodesViewModel
 
     override val binding by viewBinding(FragmentEpisodesBinding::bind)
     override val viewModel by viewModels<EpisodesViewModel>()
-    private val adapter: EpisodesAdapter = EpisodesAdapter()
+    private val adapter: EpisodesAdapter = EpisodesAdapter(this::onClickToDetail)
+    private val args by navArgs<EpisodesFragmentArgs>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,24 +55,39 @@ class EpisodesFragment : BaseFragment<FragmentEpisodesBinding, EpisodesViewModel
         setupProgressBar()
     }
 
-    private fun setupProgressBar() {
+    private fun setupProgressBar() = with(binding) {
         adapter.addLoadStateListener {
             if (view != null) {
-                binding.episodesLoading.isVisible = it.refresh is LoadState.Loading
+                episodesLoading.isVisible = it.refresh is LoadState.Loading
+                episodesRecycler.isVisible = it.refresh !is LoadState.Error
+                container.containerNotFound.isVisible =
+                    it.refresh is LoadState.Error && it.append is LoadState.NotLoading
             }
         }
     }
 
     override fun setupRequests() {
-        viewModel.getEpisodes("")
+        if (args.episode == "") {
+            viewModel.getEpisodes("")
+        } else {
+            viewModel.getEpisodesWithFilter("", args.episode)
+        }
     }
 
     override fun setupObserves() {
-        viewModel.episodesSate.observe(viewLifecycleOwner, {
-            lifecycleScope.launch {
-                adapter.submitData(it)
-            }
-        })
+        if (args.episode == "") {
+            viewModel.episodesSate.observe(viewLifecycleOwner, {
+                lifecycleScope.launch {
+                    adapter.submitData(it)
+                }
+            })
+        } else {
+            viewModel.episodesFilterSate.observe(viewLifecycleOwner, {
+                lifecycleScope.launch {
+                    adapter.submitData(it)
+                }
+            })
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -79,8 +98,35 @@ class EpisodesFragment : BaseFragment<FragmentEpisodesBinding, EpisodesViewModel
 
         searchView.setTools(context)
 
-        searchView.submitSearch { viewModel.getEpisodes(it.toString()) }
+        if (args.episode == "") {
+            searchView.submitSearch { viewModel.getEpisodes(it.toString()) }
+        } else {
+            searchView.submitSearch {
+                viewModel.getEpisodesWithFilter(
+                    it.toString(),
+                    args.episode
+                )
+            }
+        }
 
         searchItem.setOnActionExpandListener(searchView) { hideKeyboard() }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.filter) {
+            findNavController().navigate(
+                EpisodesFragmentDirections
+                    .actionEpisodesFragmentToFilterDialogFragment(
+                        getString(R.string.episodes_filter_type)
+                    )
+            )
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun onClickToDetail(id: Int, name: String) {
+        val action = EpisodesFragmentDirections
+            .actionEpisodesFragmentToEpisodeDetailFragment(id, name)
+        findNavController().navigate(action)
     }
 }
