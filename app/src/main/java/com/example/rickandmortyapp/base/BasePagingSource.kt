@@ -27,10 +27,10 @@ abstract class BasePagingSource<ValueDto : Any, Value : Any>(
                 prevKey = null,
                 nextKey = nextPageNumber
             )
-        } catch (http: HttpException) {
-            LoadResult.Error(http)
         } catch (e: IOException) {
             LoadResult.Error(e)
+        } catch (http: HttpException) {
+            LoadResult.Error(http)
         } catch (exception: Exception) {
             LoadResult.Error(exception)
         }
