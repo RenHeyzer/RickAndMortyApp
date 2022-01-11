@@ -18,4 +18,9 @@
         android:layout_gravity="center"
         android:indeterminateTint="@color/sky_blue" />
 
+    <include
+        android:id="@+id/container"
+        layout="@layout/container_not_found"
+        android:visibility="gone" />
+
 </FrameLayout>
