@@ -21,13 +21,13 @@ sealed class RickAndMortyDto {
         val created: String?,
 
         @SerializedName("origin")
-        val origin: OriginDto,
+        val origin: OriginDto?,
 
         @SerializedName("name")
         val name: String?,
 
         @SerializedName("location")
-        val location: LocationDto,
+        val location: LocationDto?,
 
         @SerializedName("episode")
         val episode: List<String>?,
