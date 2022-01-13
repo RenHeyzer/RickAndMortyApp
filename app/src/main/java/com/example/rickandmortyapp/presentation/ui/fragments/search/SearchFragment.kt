@@ -73,23 +73,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding, SearchViewModel>(
 
     private fun registerScroll(adapter: SearchAdapter) = with(binding.searchRecycler) {
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onChanged() {
-                scrollToPosition(0)
-            }
 
-            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                scrollToPosition(0)
-            }
-
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                scrollToPosition(0)
-            }
-
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                scrollToPosition(0)
-            }
-
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 scrollToPosition(0)
             }
         })
