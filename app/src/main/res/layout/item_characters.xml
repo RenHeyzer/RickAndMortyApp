@@ -26,9 +26,11 @@
 
         <TextView
             android:id="@+id/item_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="@font/passion_one"
+            android:lines="1"
             android:textColor="@color/white"
             android:textSize="@dimen/item_title_text_size"
             app:layout_constraintLeft_toLeftOf="parent"

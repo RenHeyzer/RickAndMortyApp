@@ -19,12 +19,15 @@
 
         <TextView
             android:id="@+id/item_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="@font/passion_one"
+            android:lines="1"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/item_type"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/item_title_hint" />
 
@@ -34,20 +37,20 @@
             android:layout_height="@dimen/thirty_eight_dp"
             android:paddingTop="@dimen/two_dp"
             android:src="@drawable/ic_earth"
-            app:layout_constraintTop_toBottomOf="@id/item_type"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/item_type" />
 
         <TextView
             android:id="@+id/item_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAlignment="textEnd"
             android:fontFamily="@font/passion_one"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textAlignment="textEnd"
             android:textColor="@color/white"
             android:textSize="@dimen/item_title_text_size"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/item_type_text" />
 
         <TextView
@@ -68,9 +71,9 @@
             android:fontFamily="@font/passion_one"
             android:textColor="@color/white"
             android:textSize="@dimen/item_title_text_size"
-            app:layout_constraintTop_toBottomOf="@id/was_created_in"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/was_created_in"
             tools:text="@string/item_created_text" />
 
         <TextView
